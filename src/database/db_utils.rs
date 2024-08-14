@@ -16,17 +16,34 @@ pub fn setup_db() -> Result<(), Error> {
     let conn = get_conn();
 
     conn.execute(
+        "DROP TABLE coffee_type",
+        (),
+    )?;
+
+    conn.execute(
         "CREATE TABLE coffee_type (
 id    INTEGER PRIMARY KEY,
 name  TEXT NOT NULL
 )",
         (),
     )?;
-    let type1 = CoffeeType::new(1, "Espresso".to_string());
-    conn.execute(
-        "INSERT INTO coffee_type (name) VALUES (?1)",
-        params![&type1.name],
-    )?;
+    let coffee_types = vec![
+        CoffeeType::new(1, "Espresso Solo".to_string()),
+        CoffeeType::new(2, "Espresso Doppio".to_string()),
+        CoffeeType::new(3, "Lungo".to_string()),
+        CoffeeType::new(4, "Americano".to_string()),
+        CoffeeType::new(5, "Cappuccino".to_string()),
+        CoffeeType::new(6, "Latte Macchiato".to_string()),
+        CoffeeType::new(7, "Espresso Macchiato".to_string()),
+        CoffeeType::new(8, "Affogato al caffè".to_string()),
+        CoffeeType::new(9, "Café au lait".to_string()),
+    ];
+    for coffee_type in coffee_types {
+        conn.execute(
+            "INSERT INTO coffee_type (name) VALUES (?1)",
+            params![&coffee_type.name],
+        )?;
+    }
     Ok(())
 }
 

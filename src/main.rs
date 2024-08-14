@@ -19,7 +19,7 @@ fn main() {
         return;
     }
 
-    db_utils::setup_db();
+    println!("{:?}", db_utils::setup_db());
     // file_utils::wipe_data_folder();
-    db_utils::print_tables();
+    println!("{:?}", db_utils::print_tables());
 }
