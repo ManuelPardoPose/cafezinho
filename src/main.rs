@@ -1,5 +1,8 @@
+use cafezinho::{
+    commands::commands::{lsdb, reset},
+    file_io::file_utils,
+};
 use clap::Parser;
-use cafezinho::{commands::commands::{lsdb, reset}, file_io::file_utils};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -24,10 +27,10 @@ fn main() {
     match args.cmd.as_str() {
         "reset" => {
             reset(args.debug);
-        },
+        }
         "lsdb" => {
             lsdb(args.debug);
-        },
-        _ => {},
+        }
+        _ => {}
     }
 }

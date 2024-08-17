@@ -1,4 +1,7 @@
-use crate::{file_io::file_utils, models::models::{CoffeeType, ConsumptionEntry}};
+use crate::{
+    file_io::file_utils,
+    models::models::{CoffeeType, ConsumptionEntry},
+};
 use rusqlite::{params, Connection, Error};
 
 pub const DB_NAME: &str = "data.db3";
@@ -7,9 +10,7 @@ pub fn get_conn() -> Connection {
     let mut path = file_utils::DATA_FOLDER_PATH.to_owned();
     path.push_str(DB_NAME);
 
-    return Connection::open(
-        path
-    ).expect("SQLite Error");
+    return Connection::open(path).expect("SQLite Error");
 }
 
 pub fn setup_db() -> Result<(), Error> {
@@ -20,10 +21,7 @@ pub fn setup_db() -> Result<(), Error> {
 }
 
 pub fn setup_consumption_entry(conn: &Connection) -> Result<(), Error> {
-    let _ = conn.execute(
-        "DROP TABLE consumption_entry",
-        (),
-    );
+    let _ = conn.execute("DROP TABLE consumption_entry", ());
 
     conn.execute(
         "CREATE TABLE consumption_entry (
@@ -51,10 +49,7 @@ FOREIGN KEY(coffee_type_id) REFERENCES coffee_type(id)
 }
 
 pub fn setup_coffee_types(conn: &Connection) -> Result<(), Error> {
-    let _ = conn.execute(
-        "DROP TABLE coffee_type",
-        (),
-    );
+    let _ = conn.execute("DROP TABLE coffee_type", ());
 
     conn.execute(
         "CREATE TABLE coffee_type (
@@ -114,9 +109,9 @@ pub fn print_tables() -> Result<(), Error> {
 
     // stmt = conn.prepare(
     //     "SELECT consumption_entry.id, coffee_type.name
-// FROM consumption_entry
-// INNER JOIN coffee_type
-// ON coffee_type.id = consumption_entry.coffee_type_id"
+    // FROM consumption_entry
+    // INNER JOIN coffee_type
+    // ON coffee_type.id = consumption_entry.coffee_type_id"
     // )?;
     // let consumption_entry_iter = stmt.query_map([], |row| {
     //     let entry_id: i32 = row.get(0)?;

@@ -6,7 +6,7 @@ pub fn data_folder_exists() -> bool {
     fs::metadata(DATA_FOLDER_PATH).is_ok()
 }
 
-pub fn init_data_folder() -> io::Result<()>{
+pub fn init_data_folder() -> io::Result<()> {
     if data_folder_exists() {
         return Ok(());
     }

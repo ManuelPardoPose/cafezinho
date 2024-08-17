@@ -1,5 +1,5 @@
-use crate::file_io::file_utils;
 use crate::database::db_utils;
+use crate::file_io::file_utils;
 
 pub fn reset(debug_mode: bool) {
     println!("resetting the db...");
@@ -12,7 +12,7 @@ pub fn reset(debug_mode: bool) {
             if debug_mode {
                 println!("{:?}", e);
             }
-        },
+        }
     }
 }
 
@@ -24,7 +24,7 @@ pub fn lsdb(debug_mode: bool) {
             if debug_mode {
                 println!("{:?}", e);
             }
-        },
-        _ => {},
+        }
+        _ => {}
     }
 }
