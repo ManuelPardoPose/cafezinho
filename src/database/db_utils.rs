@@ -15,10 +15,10 @@ pub fn get_conn() -> Connection {
 pub fn setup_db() -> Result<(), Error> {
     let conn = get_conn();
 
-    conn.execute(
+    let _ = conn.execute(
         "DROP TABLE coffee_type",
         (),
-    )?;
+    );
 
     conn.execute(
         "CREATE TABLE coffee_type (
