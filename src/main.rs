@@ -1,5 +1,5 @@
 use clap::Parser;
-use cafezinho::{commands::commands::{ls, reset}, file_io::file_utils};
+use cafezinho::{commands::commands::{lsdb, reset}, file_io::file_utils};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
