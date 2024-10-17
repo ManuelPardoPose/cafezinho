@@ -1,3 +1,5 @@
+use chrono::{DateTime, Local};
+
 #[derive(Debug)]
 pub struct CoffeeType {
     pub id: i32,
@@ -14,10 +16,27 @@ impl CoffeeType {
 pub struct ConsumptionEntry {
     pub id: i32,
     pub coffee_type_id: i32,
+    pub time: String,
 }
 
 impl ConsumptionEntry {
     pub fn new(id: i32, coffee_type_id: i32) -> Self {
-        Self { id, coffee_type_id }
+        Self {
+            id,
+            coffee_type_id,
+            time: Local::now().to_string(),
+        }
     }
+
+    pub fn from_date(id: i32, coffee_type_id: i32, time: String) -> Self {
+        Self {
+            id,
+            coffee_type_id,
+            time,
+        }
+    }
+}
+
+fn time_string_to_date(time_string: String) -> String {
+    return time_string;
 }

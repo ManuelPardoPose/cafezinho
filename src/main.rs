@@ -7,7 +7,7 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 pub struct Args {
-    /// Which command to execute
+    /// Which command to execute. Options: [reset, lsdb]
     #[arg(short, long, default_value_t = ("").to_string())]
     cmd: String,
 

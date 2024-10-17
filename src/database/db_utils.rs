@@ -27,6 +27,7 @@ pub fn setup_consumption_entry(conn: &Connection) -> Result<(), Error> {
         "CREATE TABLE consumption_entry (
 id    INTEGER PRIMARY KEY,
 coffee_type_id    INTEGER,
+time    TEXT NOT NULL,
 FOREIGN KEY(coffee_type_id) REFERENCES coffee_type(id)
 )",
         (),
@@ -41,8 +42,8 @@ FOREIGN KEY(coffee_type_id) REFERENCES coffee_type(id)
     ];
     for entry in dummy_entries {
         conn.execute(
-            "INSERT INTO consumption_entry (coffee_type_id) VALUES (?1)",
-            params![&entry.coffee_type_id],
+            "INSERT INTO consumption_entry (coffee_type_id, time) VALUES (?1, ?2)",
+            params![&entry.coffee_type_id, &entry.time],
         )?;
     }
     Ok(())
@@ -93,12 +94,13 @@ pub fn print_tables() -> Result<(), Error> {
         println!("{:?}", coffee_type.unwrap());
     }
 
-    stmt = conn.prepare("SELECT id, coffee_type_id FROM consumption_entry")?;
+    stmt = conn.prepare("SELECT id, coffee_type_id, time FROM consumption_entry")?;
     let consumption_entry_iter = stmt.query_map([], |row| {
-        Ok(ConsumptionEntry {
-            id: row.get(0)?,
-            coffee_type_id: row.get(1)?,
-        })
+        Ok(ConsumptionEntry::from_date(
+            row.get(0)?,
+            row.get(1)?,
+            row.get(2)?,
+        ))
     })?;
 
     for consumption_entry in consumption_entry_iter {
