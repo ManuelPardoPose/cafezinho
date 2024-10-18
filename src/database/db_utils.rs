@@ -32,20 +32,6 @@ FOREIGN KEY(coffee_type_id) REFERENCES coffee_type(id)
 )",
         (),
     )?;
-    let dummy_entries = vec![
-        ConsumptionEntry::new(1, 1),
-        ConsumptionEntry::new(2, 1),
-        ConsumptionEntry::new(3, 4),
-        ConsumptionEntry::new(4, 4),
-        ConsumptionEntry::new(5, 4),
-        ConsumptionEntry::new(6, 2),
-    ];
-    for entry in dummy_entries {
-        conn.execute(
-            "INSERT INTO consumption_entry (coffee_type_id, time) VALUES (?1, ?2)",
-            params![&entry.coffee_type_id, &entry.time],
-        )?;
-    }
     Ok(())
 }
 
@@ -127,25 +113,60 @@ pub fn print_tables() -> Result<(), Error> {
     Ok(())
 }
 
-pub fn add_entry(coffee_type_str: String) -> Result<(), Error> {
+pub fn get_coffee_type(coffee_type_str: &str) -> Option<CoffeeType> {
     let conn = get_conn();
-    let mut stmt = conn.prepare("SELECT id, name FROM coffee_type WHERE name=:name")?;
-    let mut coffee_type_iter = stmt.query_map(&[(":name", &coffee_type_str)], |row| {
+    let mut stmt = match conn.prepare("SELECT id, name FROM coffee_type WHERE name=:name") {
+        Err(_) => return None,
+        Ok(stmt) => stmt,
+    };
+    let mut coffee_type_iter = match stmt.query_map(&[(":name", &coffee_type_str)], |row| {
         Ok(CoffeeType {
             id: row.get(0)?,
             name: row.get(1)?,
         })
-    })?;
-    let first = coffee_type_iter.next();
-    if first.is_none() {
-        // TODO: add coffee type
-    }
+    }) {
+        Err(_) => return None,
+        Ok(iter) => iter,
+    };
+    let first_coffee_type = match coffee_type_iter.next() {
+        None => return None,
+        Some(first_result) => match first_result {
+            Err(_) => return None,
+            Ok(coffee_type) => coffee_type,
+        },
+    };
+    return Some(first_coffee_type);
+}
 
-    let coffee_type = first.unwrap().unwrap();
+pub fn add_coffee_type(coffee_type_str: &str) -> Option<CoffeeType> {
+    let conn = get_conn();
+    let new_coffee_type = CoffeeType::new(1, coffee_type_str.to_string());
+    match conn.execute(
+        "INSERT INTO coffee_type (name) VALUES (?1)",
+        params![&new_coffee_type.name],
+    ) {
+        Err(_) => return None,
+        Ok(_) => { },
+    };
+    return get_coffee_type(coffee_type_str); // tries to retrieve from db to confirm existence
+} 
+
+pub fn add_entry(coffee_type_str: String) -> Result<(), &'static str> {
+    let conn = get_conn();
+    let coffee_type = match get_coffee_type(&coffee_type_str) {
+        None => match add_coffee_type(&coffee_type_str) {
+            None => return Err("CoffeeType could not be added"),
+            Some(v) => v,
+        },
+        Some(d) => d,
+    };
+
     let new_entry = ConsumptionEntry::new(0, coffee_type.id); // id is irrelevant here
-    conn.execute(
+    match conn.execute(
         "INSERT INTO consumption_entry (coffee_type_id, time) VALUES (?1, ?2)",
         params![&new_entry.coffee_type_id, &new_entry.time],
-    )?;
-    Ok(())
+    ) {
+        Ok(_) => return Ok(()),
+        Err(_) => return Err("ConsumptionEntry could not be created"),
+    }
 }
