@@ -126,3 +126,26 @@ pub fn print_tables() -> Result<(), Error> {
     // }
     Ok(())
 }
+
+pub fn add_entry(coffee_type_str: String) -> Result<(), Error> {
+    let conn = get_conn();
+    let mut stmt = conn.prepare("SELECT id, name FROM coffee_type WHERE name=:name")?;
+    let mut coffee_type_iter = stmt.query_map(&[(":name", &coffee_type_str)], |row| {
+        Ok(CoffeeType {
+            id: row.get(0)?,
+            name: row.get(1)?,
+        })
+    })?;
+    let first = coffee_type_iter.next();
+    if first.is_none() {
+        // TODO: add coffee type
+    }
+
+    let coffee_type = first.unwrap().unwrap();
+    let new_entry = ConsumptionEntry::new(0, coffee_type.id); // id is irrelevant here
+    conn.execute(
+        "INSERT INTO consumption_entry (coffee_type_id, time) VALUES (?1, ?2)",
+        params![&new_entry.coffee_type_id, &new_entry.time],
+    )?;
+    Ok(())
+}

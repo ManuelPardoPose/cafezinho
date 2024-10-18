@@ -1,5 +1,5 @@
 use cafezinho::{
-    commands::commands::{lsdb, reset},
+    commands::commands::{drink, lsdb, reset},
     file_io::file_utils,
 };
 use clap::Parser;
@@ -7,12 +7,20 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 pub struct Args {
-    /// Which command to execute. Options: [reset, lsdb]
-    #[arg(short, long, default_value_t = ("").to_string())]
-    cmd: String,
+    /// Reset Database
+    #[arg(short, long, default_value_t = false)]
+    reset: bool,
+
+    /// List Database
+    #[arg(short, long, default_value_t = false)]
+    lsdb: bool,
+
+    /// Add a consumption entry
+    #[arg(short, long, default_value_t = String::from(""))]
+    drink: String,
 
     /// Debug mode
-    #[arg(short, long, default_value_t = false)]
+    #[arg(long, default_value_t = false)]
     debug: bool,
 }
 
@@ -24,13 +32,15 @@ fn main() {
         return;
     }
 
-    match args.cmd.as_str() {
-        "reset" => {
-            reset(args.debug);
-        }
-        "lsdb" => {
-            lsdb(args.debug);
-        }
-        _ => {}
+    if args.reset {
+        reset(args.debug);
+    }
+
+    if args.drink != "" {
+        drink(args.debug, args.drink);
+    }
+
+    if args.lsdb {
+        lsdb(args.debug);
     }
 }
