@@ -146,10 +146,10 @@ pub fn add_coffee_type(coffee_type_str: &str) -> Option<CoffeeType> {
         params![&new_coffee_type.name],
     ) {
         Err(_) => return None,
-        Ok(_) => { },
+        Ok(_) => {}
     };
     return get_coffee_type(coffee_type_str); // tries to retrieve from db to confirm existence
-} 
+}
 
 pub fn add_entry(coffee_type_str: String) -> Result<(), &'static str> {
     let conn = get_conn();
