@@ -181,7 +181,7 @@ pub fn print_stats() -> Result<(), Error> {
     })?;
     let total_coffees_consumed = match entry_iter.next() {
         Some(value) => value,
-        None => return Ok(()),
+        None => Ok(String::from("0")),
     };
     let total_coffees_consumed = total_coffees_consumed.unwrap_or_default();
 
@@ -196,7 +196,7 @@ pub fn print_stats() -> Result<(), Error> {
     })?;
     let coffees_consumed_today = match entry_iter.next() {
         Some(value) => value,
-        None => return Ok(()),
+        None => Ok(String::from("0")),
     };
     let coffees_consumed_today = coffees_consumed_today.unwrap_or_default();
 
@@ -214,7 +214,7 @@ pub fn print_stats() -> Result<(), Error> {
     })?;
     let favorite_coffee_type = match entry_iter.next() {
         Some(value) => value,
-        None => return Ok(()),
+        None => Ok(String::from("none")),
     };
     let favorite_coffee_type = favorite_coffee_type.unwrap_or_default();
 
