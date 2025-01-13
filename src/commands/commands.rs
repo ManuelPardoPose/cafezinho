@@ -33,6 +33,16 @@ pub fn drink(debug_mode: bool, coffee_type_str: String) {
     }
 }
 
+pub fn stats(debug_mode: bool) {
+    println!("printing the stats");
+    match db_utils::print_stats() {
+        Err(e) => {
+            print_db_error(e, debug_mode);
+        }
+        _ => {}
+    }
+}
+
 pub fn print_db_error(e: Error, debug_mode: bool) {
     println!("ERROR");
     if debug_mode {

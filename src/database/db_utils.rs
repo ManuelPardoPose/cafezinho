@@ -170,3 +170,56 @@ pub fn add_entry(coffee_type_str: String) -> Result<(), &'static str> {
         Err(_) => return Err("ConsumptionEntry could not be created"),
     }
 }
+
+pub fn print_stats() -> Result<(), Error> {
+    println!("-------------------STATS-------------------");
+    let conn = get_conn();
+    let mut stmt = conn.prepare("SELECT COUNT(*) FROM consumption_entry")?;
+    let mut entry_iter = stmt.query_map([], |row| {
+        let count: i32 = row.get(0)?;
+        Ok(format!("{}", count))
+    })?;
+    let total_coffees_consumed = match entry_iter.next() {
+        Some(value) => value,
+        None => return Ok(()),
+    };
+    let total_coffees_consumed = total_coffees_consumed.unwrap_or_default();
+
+    let mut stmt = conn.prepare(
+        "SELECT COUNT(*) FROM consumption_entry
+        WHERE date(time) = date()
+        ",
+    )?;
+    let mut entry_iter = stmt.query_map([], |row| {
+        let count: i32 = row.get(0)?;
+        Ok(format!("{}", count))
+    })?;
+    let coffees_consumed_today = match entry_iter.next() {
+        Some(value) => value,
+        None => return Ok(()),
+    };
+    let coffees_consumed_today = coffees_consumed_today.unwrap_or_default();
+
+    let mut stmt = conn.prepare(
+        "SELECT coffee_type.name
+        FROM consumption_entry
+        INNER JOIN coffee_type
+        ON coffee_type.id = consumption_entry.coffee_type_id
+        GROUP BY coffee_type.name
+        ORDER BY COUNT(coffee_type.name) DESC",
+    )?;
+    let mut entry_iter = stmt.query_map([], |row| {
+        let coffee_type_name: String = row.get(0)?;
+        Ok(format!("{}", coffee_type_name))
+    })?;
+    let favorite_coffee_type = match entry_iter.next() {
+        Some(value) => value,
+        None => return Ok(()),
+    };
+    let favorite_coffee_type = favorite_coffee_type.unwrap_or_default();
+
+    println!("consumed in total: {}", total_coffees_consumed);
+    println!("consumed today: {}", coffees_consumed_today);
+    println!("favorite coffee type: {}", favorite_coffee_type);
+    return Ok(());
+}
