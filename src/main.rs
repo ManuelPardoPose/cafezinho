@@ -1,5 +1,5 @@
 use cafezinho::{
-    commands::commands::{drink, lsdb, reset, stats},
+    commands::commands::{drink, history, lsdb, reset, stats},
     file_io::file_utils,
 };
 use clap::Parser;
@@ -26,6 +26,10 @@ pub struct Args {
     /// List Stats
     #[arg(short, long, default_value_t = false)]
     stats: bool,
+
+    /// List History
+    #[arg(long, default_value_t = false)]
+    history: bool,
 }
 
 fn main() {
@@ -50,5 +54,9 @@ fn main() {
 
     if args.stats {
         stats(args.debug);
+    }
+
+    if args.history {
+        history(args.debug);
     }
 }

@@ -35,6 +35,6 @@ impl ConsumptionEntry {
     }
 }
 
-fn time_string_to_date(time_string: &String) -> DateTime<Local> {
+pub fn time_string_to_date(time_string: &String) -> DateTime<Local> {
     return DateTime::from_str(time_string).unwrap_or_default();
 }

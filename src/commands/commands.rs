@@ -40,6 +40,15 @@ pub fn stats(debug_mode: bool) {
     }
 }
 
+pub fn history(debug_mode: bool) {
+    match db_utils::print_history() {
+        Err(e) => {
+            print_db_error(e, debug_mode);
+        }
+        _ => {}
+    }
+}
+
 pub fn print_db_error(e: Error, debug_mode: bool) {
     println!("ERROR");
     if debug_mode {

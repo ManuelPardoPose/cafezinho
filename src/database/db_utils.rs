@@ -1,7 +1,8 @@
 use crate::{
     file_io::file_utils,
-    models::models::{CoffeeType, ConsumptionEntry},
+    models::models::{time_string_to_date, CoffeeType, ConsumptionEntry},
 };
+use chrono::Datelike;
 use rusqlite::{params, Connection, Error};
 
 pub const DB_NAME: &str = "data.db3";
@@ -221,5 +222,32 @@ pub fn print_stats() -> Result<(), Error> {
     println!("consumed in total: {}", total_coffees_consumed);
     println!("consumed today: {}", coffees_consumed_today);
     println!("favorite coffee type: {}", favorite_coffee_type);
+    return Ok(());
+}
+
+pub fn print_history() -> Result<(), Error> {
+    println!("-------------------HISTORY-------------------");
+    let conn = get_conn();
+    let mut stmt = conn.prepare(
+        "SELECT coffee_type.name, consumption_entry.time
+        FROM consumption_entry
+        INNER JOIN coffee_type
+        ON coffee_type.id = consumption_entry.coffee_type_id
+        ORDER BY consumption_entry.time DESC",
+    )?;
+    let consumption_entry_iter = stmt.query_map([], |row| {
+        let coffee_type_name: String = row.get(0)?;
+        let time_str: String = row.get(1)?;
+        let time = time_string_to_date(&time_str);
+        Ok(format!(
+            "{} [{}]",
+            coffee_type_name,
+            time.format("%d.%m.%Y %H:%M")
+        ))
+    })?;
+
+    for consumption_entry in consumption_entry_iter {
+        println!("{}", consumption_entry.unwrap());
+    }
     return Ok(());
 }
